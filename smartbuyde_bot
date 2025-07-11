@@ -1,0 +1,34 @@
+import logging
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
+from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, filters, ContextTypes, CallbackQueryHandler
+
+TOKEN = "7579483611:AAEOEmbz2n6oad_kVC0LLIBjvp6XfSdQYsw"
+
+logging.basicConfig(
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    level=logging.INFO
+)
+
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await update.message.reply_text(
+        "Ласкаво просимо до SmartBuyDE! Оберіть категорію товару:",
+        reply_markup=InlineKeyboardMarkup([
+            [InlineKeyboardButton("📱 Телефони", callback_data='phones')],
+            [InlineKeyboardButton("👟 Одяг / Взуття", callback_data='clothes')],
+            [InlineKeyboardButton("💻 Комп'ютери", callback_data='computers')],
+            [InlineKeyboardButton("🧰 Інструменти", callback_data='tools')],
+        ])
+    )
+
+async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query = update.callback_query
+    await query.answer()
+    await query.edit_message_text(text=f"🔍 Пошук по категорії: {query.data} (в розробці)")
+
+if __name__ == '__main__':
+    app = ApplicationBuilder().token(TOKEN).build()
+
+    app.add_handler(CommandHandler("start", start))
+    app.add_handler(CallbackQueryHandler(handle_callback))
+
+    app.run_polling()
